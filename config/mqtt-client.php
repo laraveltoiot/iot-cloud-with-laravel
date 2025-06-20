@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default_connection' => 'default',
+    'default_connection' => env('MQTT_DEFAULT_CONNECTION', 'hivemq'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,32 +32,32 @@ return [
 
     'connections' => [
 
-        'default' => [
+        'hivemq' => [
 
             // The host and port to which the client shall connect.
-            'host' => env('MQTT_HOST'),
-            'port' => env('MQTT_PORT', 1883),
+            'host' => env('MQTT_HIVEMQ_HOST'),
+            'port' => env('MQTT_HIVEMQ_PORT'),
 
             // The MQTT protocol version used for the connection.
             'protocol' => MqttClient::MQTT_3_1,
 
             // A specific client id to be used for the connection. If omitted,
             // a random client id will be generated for each new connection.
-            'client_id' => env('MQTT_CLIENT_ID'),
+            'client_id' => env('MQTT_HIVEMQ_CLIENT_ID'),
 
             // Whether a clean session shall be used and requested by the client.
             // A clean session will let the broker forget about subscriptions and
             // queued messages when the client disconnects. Also, if available,
             // data of a previous session will be deleted when connecting.
-            'use_clean_session' => env('MQTT_CLEAN_SESSION', true),
+            'use_clean_session' => env('MQTT_HIVEMQ_CLEAN_SESSION', true),
 
             // Whether logging shall be enabled. The default logger will be used
             // with the log level as configured.
-            'enable_logging' => env('MQTT_ENABLE_LOGGING', true),
+            'enable_logging' => env('MQTT_HIVEMQ_ENABLE_LOGGING', true),
 
             // Which logging channel to use for logs produced by the MQTT client.
             // If left empty, the default log channel or stack is being used.
-            'log_channel' => env('MQTT_LOG_CHANNEL', null),
+            'log_channel' => env('MQTT_HIVEMQ_LOG_CHANNEL', null),
 
             // Defines which repository implementation shall be used. Currently,
             // only a MemoryRepository is supported.
@@ -73,7 +73,7 @@ return [
                     'allow_self_signed_certificate' => env('MQTT_TLS_ALLOW_SELF_SIGNED_CERT', false),
                     'verify_peer' => env('MQTT_TLS_VERIFY_PEER', true),
                     'verify_peer_name' => env('MQTT_TLS_VERIFY_PEER_NAME', true),
-                    'ca_file' => env('MQTT_TLS_CA_FILE'),
+                    'ca_file' => storage_path(env('MQTT_TLS_CA_FILE')),
                     'ca_path' => env('MQTT_TLS_CA_PATH'),
                     'client_certificate_file' => env('MQTT_TLS_CLIENT_CERT_FILE'),
                     'client_certificate_key_file' => env('MQTT_TLS_CLIENT_CERT_KEY_FILE'),
@@ -115,6 +115,25 @@ return [
 
             ],
 
+        ],
+        'mosquito' => [
+            'host' => env('MQTT_MOSQUITTO_HOST', 'test.mosquitto.org'),
+            'port' => env('MQTT_MOSQUITTO_PORT', 1883),
+            'protocol' => MqttClient::MQTT_3_1,
+            'client_id' => env('MQTT_MOSQUITTO_CLIENT_ID', 'laravel-mosquitto'),
+            'use_clean_session' => env('MQTT_MOSQUITTO_CLEAN_SESSION', true),
+            'enable_logging' => env('MQTT_MOSQUITTO_ENABLE_LOGGING', true),
+            'log_channel' => env('MQTT_MOSQUITTO_LOG_CHANNEL', null),
+            'repository' => MemoryRepository::class,
+            'connection_settings' => [
+                'tls' => [
+                    'enabled' => false,
+                ],
+                'auth' => [
+                    'username' => env('MQTT_MOSQUITTO_USERNAME'),
+                    'password' => env('MQTT_MOSQUITTO_PASSWORD'),
+                ],
+            ],
         ],
 
     ],
