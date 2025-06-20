@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -40,15 +41,11 @@ final class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are not mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -83,5 +80,37 @@ final class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    /**
+     * Get the devices for the user.
+     */
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Device::class);
+    }
+
+    /**
+     * Get the things for the user.
+     */
+    public function things(): HasMany
+    {
+        return $this->hasMany(Thing::class);
+    }
+
+    /**
+     * Get the triggers for the user.
+     */
+    public function triggers(): HasMany
+    {
+        return $this->hasMany(Trigger::class);
+    }
+
+    /**
+     * Get the dashboards for the user.
+     */
+    public function dashboards(): HasMany
+    {
+        return $this->hasMany(Dashboard::class);
     }
 }
