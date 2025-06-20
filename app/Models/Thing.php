@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Thing extends Model
+/**
+ * @mixin IdeHelperThing
+ */
+final class Thing extends Model
 {
     use HasFactory;
 

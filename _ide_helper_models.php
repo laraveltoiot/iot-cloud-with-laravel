@@ -15,6 +15,87 @@ namespace App\Models{
 /**
  * 
  *
+ * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DashboardWidget> $widgets
+ * @property-read int|null $widgets_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Dashboard newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Dashboard newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Dashboard query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperDashboard {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property-read \App\Models\Dashboard|null $dashboard
+ * @property-read \App\Models\Variable|null $variable
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DashboardWidget query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperDashboardWidget {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Thing> $things
+ * @property-read int|null $things_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Device newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Device newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Device query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperDevice {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Device> $devices
+ * @property-read int|null $devices_count
+ * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Variable> $variables
+ * @property-read int|null $variables_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperThing {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property-read \App\Models\Variable|null $sourceVariable
+ * @property-read \App\Models\Variable|null $targetVariable
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Trigger newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Trigger newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Trigger query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperTrigger {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property string $email
@@ -37,9 +118,37 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Dashboard> $dashboards
+ * @property-read int|null $dashboards_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Device> $devices
+ * @property-read int|null $devices_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Thing> $things
+ * @property-read int|null $things_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Trigger> $triggers
+ * @property-read int|null $triggers_count
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
 	final class IdeHelperUser {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DashboardWidget> $dashboardWidgets
+ * @property-read int|null $dashboard_widgets_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Trigger> $sourceTriggers
+ * @property-read int|null $source_triggers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Trigger> $targetTriggers
+ * @property-read int|null $target_triggers_count
+ * @property-read \App\Models\Thing|null $thing
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Variable newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Variable newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Variable query()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperVariable {}
 }
 
