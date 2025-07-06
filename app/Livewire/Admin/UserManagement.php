@@ -6,10 +6,13 @@ use App\Models\User;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 
 final class UserManagement extends Component
 {
@@ -48,8 +51,8 @@ final class UserManagement extends Component
     /**
      * Get the users with pagination and sorting.
      */
-    #[\Livewire\Attributes\Computed]
-    public function users()
+    #[Computed]
+    public function users(): array|LengthAwarePaginator
     {
         return User::query()
             ->when($this->search, function ($query, $search) {
@@ -98,13 +101,26 @@ final class UserManagement extends Component
 
         $this->resetForm();
         $this->dispatch('user-created');
-        $this->dispatch('close-modal', 'create-user');
+        $this->modal('create-user')->close();
     }
 
     /**
-     * Edit an existing user.
+     * Load user data for editing when the edit modal is opened.
      */
-    public function editUser(int $userId): void
+    #[On('modal-opened')]
+    public function handleModalOpened($modalName): void
+    {
+        // Check if the modal name starts with 'edit-user-'
+        if (str_starts_with($modalName, 'edit-user-')) {
+            $userId = (int) str_replace('edit-user-', '', $modalName);
+            $this->loadUserData($userId);
+        }
+    }
+
+    /**
+     * Load user data for editing.
+     */
+    private function loadUserData(int $userId): void
     {
         $this->resetForm();
 
@@ -112,6 +128,14 @@ final class UserManagement extends Component
         $this->editingUserId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
+    }
+
+    /**
+     * Edit an existing user (legacy method, kept for backward compatibility).
+     */
+    public function editUser(int $userId): void
+    {
+        $this->loadUserData($userId);
     }
 
     /**
@@ -138,7 +162,7 @@ final class UserManagement extends Component
 
         $this->resetForm();
         $this->dispatch('user-updated');
-        $this->dispatch('close-modal', 'edit-user-' . $userId);
+        $this->modal('edit-user-' . $userId)->close();
     }
 
     /**
@@ -150,7 +174,22 @@ final class UserManagement extends Component
         $user->delete();
 
         $this->dispatch('user-deleted');
-        $this->dispatch('close-modal', 'delete-user-' . $userId);
+        $this->modal('delete-user-' . $userId)->close();
     }
 
+    /**
+     * Cancel delete operation and close the modal.
+     */
+    public function cancelDelete(int $userId): void
+    {
+        $this->modal('delete-user-' . $userId)->close();
+    }
+
+    /**
+     * Close a modal by name.
+     */
+    public function closeModal(string $name): void
+    {
+        $this->modal($name)->close();
+    }
 }
