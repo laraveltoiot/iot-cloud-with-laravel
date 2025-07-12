@@ -10,30 +10,35 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\On;
 
 final class UserManagement extends Component
 {
     use WithPagination;
-
-    public string $name = '';
-    public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
-
-    public ?int $editingUserId = null;
-
-    public string $search = '';
-    public string $sortBy = 'name';
-    public string $sortDirection = 'asc';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'sortBy' => ['except' => 'name'],
         'sortDirection' => ['except' => 'asc'],
     ];
+
+    public string $name = '';
+
+    public string $email = '';
+
+    public string $password = '';
+
+    public string $password_confirmation = '';
+
+    public ?int $editingUserId = null;
+
+    public string $search = '';
+
+    public string $sortBy = 'name';
+
+    public string $sortDirection = 'asc';
 
     /**
      * Sort the data by the given column.
@@ -118,19 +123,6 @@ final class UserManagement extends Component
     }
 
     /**
-     * Load user data for editing.
-     */
-    private function loadUserData(int $userId): void
-    {
-        $this->resetForm();
-
-        $user = User::findOrFail($userId);
-        $this->editingUserId = $user->id;
-        $this->name = $user->name;
-        $this->email = $user->email;
-    }
-
-    /**
      * Edit an existing user (legacy method, kept for backward compatibility).
      */
     public function editUser(int $userId): void
@@ -147,7 +139,7 @@ final class UserManagement extends Component
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'password' => ['nullable', 'string', 'confirmed', Password::defaults()],
         ]);
 
@@ -162,7 +154,7 @@ final class UserManagement extends Component
 
         $this->resetForm();
         $this->dispatch('user-updated');
-        $this->modal('edit-user-' . $userId)->close();
+        $this->modal('edit-user-'.$userId)->close();
     }
 
     /**
@@ -174,7 +166,7 @@ final class UserManagement extends Component
         $user->delete();
 
         $this->dispatch('user-deleted');
-        $this->modal('delete-user-' . $userId)->close();
+        $this->modal('delete-user-'.$userId)->close();
     }
 
     /**
@@ -182,7 +174,7 @@ final class UserManagement extends Component
      */
     public function cancelDelete(int $userId): void
     {
-        $this->modal('delete-user-' . $userId)->close();
+        $this->modal('delete-user-'.$userId)->close();
     }
 
     /**
@@ -191,5 +183,18 @@ final class UserManagement extends Component
     public function closeModal(string $name): void
     {
         $this->modal($name)->close();
+    }
+
+    /**
+     * Load user data for editing.
+     */
+    private function loadUserData(int $userId): void
+    {
+        $this->resetForm();
+
+        $user = User::findOrFail($userId);
+        $this->editingUserId = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
     }
 }
