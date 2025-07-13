@@ -2,6 +2,7 @@
 
 namespace App\Livewire\IoTThing;
 
+use App\Models\Device;
 use App\Models\Sketch;
 use App\Models\Thing;
 use Flux;
@@ -56,9 +57,16 @@ final class ThingManagement extends Component
 
     public $sketches = [];
 
+    public $devices = [];
+
+    public $selectedDevices = [];
+
+    public $deviceConfigs = [];
+
     public function mount(): void
     {
         $this->loadSketches();
+        $this->loadDevices();
     }
 
     public function sort($column): void
@@ -85,10 +93,28 @@ final class ThingManagement extends Component
             ->toArray();
     }
 
+    private function loadDevices(): void
+    {
+        $this->devices = Device::where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get()
+            ->map(function ($device) {
+                return [
+                    'id' => $device->id,
+                    'name' => $device->name,
+                    'device_id' => $device->device_id,
+                    'type' => $device->type,
+                    'status' => $device->status,
+                ];
+            })
+            ->toArray();
+    }
+
     #[Computed]
     public function things(): LengthAwarePaginator
     {
         return Thing::query()
+            ->with('devices')
             ->where('user_id', auth()->id())
             ->when($this->sortBy, fn ($query) => $query->orderBy($this->sortBy, $this->sortDirection))
             ->paginate(10);
@@ -103,7 +129,7 @@ final class ThingManagement extends Component
 
     public function editThing($thingId): void
     {
-        $thing = Thing::find($thingId);
+        $thing = Thing::with('devices')->find($thingId);
         if (! $thing) {
             return;
         }
@@ -118,6 +144,16 @@ final class ThingManagement extends Component
         $this->network_config = is_array($thing->network_config) ? json_encode($thing->network_config) : $thing->network_config;
         $this->sketch_id = $thing->sketch_id;
         $this->status = $thing->status;
+
+        // Load associated devices
+        $this->selectedDevices = $thing->devices->pluck('id')->toArray();
+
+        // Load device configurations
+        $this->deviceConfigs = [];
+        foreach ($thing->devices as $device) {
+            $config = $device->pivot->config;
+            $this->deviceConfigs[$device->id] = is_array($config) ? json_encode($config) : $config;
+        }
     }
 
     public function saveThing(): void
@@ -142,12 +178,36 @@ final class ThingManagement extends Component
             $thing = Thing::find($this->editingThingId);
             if ($thing) {
                 $thing->update($data);
+
+                // Update device associations
+                $deviceData = [];
+                foreach ($this->selectedDevices as $deviceId) {
+                    $config = isset($this->deviceConfigs[$deviceId]) ? $this->deviceConfigs[$deviceId] : null;
+                    $deviceData[$deviceId] = [
+                        'config' => $config ? json_encode(json_decode($config, true)) : null,
+                    ];
+                }
+
+                $thing->devices()->sync($deviceData);
+
                 // Close the edit modal
                 Flux::modal('edit-thing-'.$this->editingThingId)->close();
             }
         } else {
             // Create new thing
-            Thing::create($data);
+            $thing = Thing::create($data);
+
+            // Create device associations
+            $deviceData = [];
+            foreach ($this->selectedDevices as $deviceId) {
+                $config = isset($this->deviceConfigs[$deviceId]) ? $this->deviceConfigs[$deviceId] : null;
+                $deviceData[$deviceId] = [
+                    'config' => $config ? json_encode(json_decode($config, true)) : null,
+                ];
+            }
+
+            $thing->devices()->sync($deviceData);
+
             // Close the create modal
             Flux::modal('create-thing')->close();
         }
@@ -188,6 +248,35 @@ final class ThingManagement extends Component
         return $thingId;
     }
 
+    public function updateDeviceConfig($deviceId, $config): void
+    {
+        $this->deviceConfigs[$deviceId] = $config;
+    }
+
+    public function toggleDevice($deviceId): void
+    {
+        $index = array_search($deviceId, $this->selectedDevices);
+
+        if ($index !== false) {
+            // Remove device from selection
+            unset($this->selectedDevices[$index]);
+            $this->selectedDevices = array_values($this->selectedDevices); // Re-index array
+
+            // Remove device config
+            if (isset($this->deviceConfigs[$deviceId])) {
+                unset($this->deviceConfigs[$deviceId]);
+            }
+        } else {
+            // Add device to selection
+            $this->selectedDevices[] = $deviceId;
+
+            // Initialize device config if not exists
+            if (!isset($this->deviceConfigs[$deviceId])) {
+                $this->deviceConfigs[$deviceId] = json_encode(['pin_mapping' => []]);
+            }
+        }
+    }
+
     private function resetForm(): void
     {
         $this->editingThingId = null;
@@ -201,5 +290,7 @@ final class ThingManagement extends Component
         $this->network_config = '';
         $this->sketch_id = null;
         $this->status = 'offline';
+        $this->selectedDevices = [];
+        $this->deviceConfigs = [];
     }
 }

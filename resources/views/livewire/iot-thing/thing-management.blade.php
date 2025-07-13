@@ -12,6 +12,7 @@
             <flux:table.column sortable :sorted="$sortBy === 'thing_id'" :direction="$sortDirection" wire:click="sort('thing_id')">Thing ID</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'description'" :direction="$sortDirection" wire:click="sort('description')">Description</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'status'" :direction="$sortDirection" wire:click="sort('status')">Status</flux:table.column>
+            <flux:table.column>Devices</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">Created</flux:table.column>
             <flux:table.column>Actions</flux:table.column>
         </flux:table.columns>
@@ -25,6 +26,11 @@
                     <flux:table.cell>
                         <flux:badge size="sm" :color="$thing->status === 'online' ? 'green' : ($thing->status === 'offline' ? 'gray' : 'red')" inset="top bottom">
                             {{ ucfirst($thing->status) }}
+                        </flux:badge>
+                    </flux:table.cell>
+                    <flux:table.cell>
+                        <flux:badge size="sm" color="blue" inset="top bottom">
+                            {{ $thing->devices->count() }}
                         </flux:badge>
                     </flux:table.cell>
                     <flux:table.cell>{{ $thing->created_at->format('Y-m-d H:i') }}</flux:table.cell>
@@ -44,7 +50,7 @@
     </flux:table>
 
     <!-- Create Thing Modal -->
-    <flux:modal name="create-thing" class="md:w-96">
+    <flux:modal name="create-thing" class="w-5xl">
         <div class="space-y-6">
             <div>
                 <flux:heading size="lg">Add New Thing</flux:heading>
@@ -90,6 +96,53 @@
                     </flux:select>
                     @error('status') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
 
+                    <div>
+                        <flux:label>Associated Devices</flux:label>
+                        <div class="mt-2 border rounded-md p-3 max-h-60 overflow-y-auto">
+                            @if(count($devices) > 0)
+                                @foreach($devices as $device)
+                                    <div class="flex items-center justify-between py-2 border-b last:border-b-0">
+                                        <div class="flex items-center">
+                                            <flux:checkbox
+                                                wire:click="toggleDevice({{ $device['id'] }})"
+                                                :checked="in_array($device['id'], $selectedDevices)"
+                                            />
+                                            <span class="ml-2">{{ $device['name'] }} ({{ $device['device_id'] }})</span>
+                                            <flux:badge size="sm" :color="$device['status'] === 'online' ? 'green' : ($device['status'] === 'offline' ? 'gray' : 'yellow')" class="ml-2">
+                                                {{ ucfirst($device['status']) }}
+                                            </flux:badge>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="text-gray-500 py-2">No devices available. Create devices first.</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if(count($selectedDevices) > 0)
+                        <div>
+                            <flux:label>Device Configurations</flux:label>
+                            <div class="mt-2 space-y-4">
+                                @foreach($selectedDevices as $deviceId)
+                                    @php
+                                        $device = collect($devices)->firstWhere('id', $deviceId);
+                                    @endphp
+                                    @if($device)
+                                        <div class="border rounded-md p-3">
+                                            <div class="font-medium mb-2">{{ $device['name'] }} ({{ $device['device_id'] }})</div>
+                                            <flux:textarea
+                                                label="Configuration (JSON)"
+                                                wire:model="deviceConfigs.{{ $deviceId }}"
+                                                placeholder='{"pin_mapping": {"pin_1": "digital_input", "pin_2": "digital_output"}}'
+                                            />
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="flex justify-end space-x-2 pt-4">
                         <flux:modal.close>
                             <flux:button>Cancel</flux:button>
@@ -103,7 +156,7 @@
 
     <!-- Edit Thing Modals -->
     @foreach ($this->things as $thing)
-        <flux:modal :name="'edit-thing-' . $thing->id" class="md:w-96">
+        <flux:modal :name="'edit-thing-' . $thing->id" class="w-5xl">
             <div class="space-y-6">
                 <div>
                     <flux:heading size="lg">Edit Thing</flux:heading>
@@ -147,6 +200,53 @@
                             <option value="error">Error</option>
                         </flux:select>
                         @error('status') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <div>
+                            <flux:label>Associated Devices</flux:label>
+                            <div class="mt-2 border rounded-md p-3 max-h-60 overflow-y-auto">
+                                @if(count($devices) > 0)
+                                    @foreach($devices as $device)
+                                        <div class="flex items-center justify-between py-2 border-b last:border-b-0">
+                                            <div class="flex items-center">
+                                                <flux:checkbox
+                                                    wire:click="toggleDevice({{ $device['id'] }})"
+                                                    :checked="in_array($device['id'], $selectedDevices)"
+                                                />
+                                                <span class="ml-2">{{ $device['name'] }} ({{ $device['device_id'] }})</span>
+                                                <flux:badge size="sm" :color="$device['status'] === 'online' ? 'green' : ($device['status'] === 'offline' ? 'gray' : 'yellow')" class="ml-2">
+                                                    {{ ucfirst($device['status']) }}
+                                                </flux:badge>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="text-gray-500 py-2">No devices available. Create devices first.</div>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if(count($selectedDevices) > 0)
+                            <div>
+                                <flux:label>Device Configurations</flux:label>
+                                <div class="mt-2 space-y-4">
+                                    @foreach($selectedDevices as $deviceId)
+                                        @php
+                                            $device = collect($devices)->firstWhere('id', $deviceId);
+                                        @endphp
+                                        @if($device)
+                                            <div class="border rounded-md p-3">
+                                                <div class="font-medium mb-2">{{ $device['name'] }} ({{ $device['device_id'] }})</div>
+                                                <flux:textarea
+                                                    label="Configuration (JSON)"
+                                                    wire:model="deviceConfigs.{{ $deviceId }}"
+                                                    placeholder='{"pin_mapping": {"pin_1": "digital_input", "pin_2": "digital_output"}}'
+                                                />
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="flex justify-end space-x-2 pt-4">
                             <flux:modal.close>
