@@ -129,7 +129,7 @@ final class DeviceManagement extends Component
         }
     }
 
-    public function render(): View|Application|Factory|\Illuminate\View\View
+    public function render()
     {
         return view('livewire.iot-device.device-management');
     }

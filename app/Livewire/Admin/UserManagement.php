@@ -57,7 +57,7 @@ final class UserManagement extends Component
      * Get the users with pagination and sorting.
      */
     #[Computed]
-    public function users(): array|LengthAwarePaginator
+    public function users()
     {
         return User::query()
             ->when($this->search, function ($query, $search) {
@@ -73,7 +73,7 @@ final class UserManagement extends Component
     /**
      * Render the component.
      */
-    public function render(): View|Application|Factory|\Illuminate\View\View
+    public function render()
     {
         return view('livewire.admin.user-management');
     }
@@ -170,7 +170,7 @@ final class UserManagement extends Component
     }
 
     /**
-     * Cancel delete operation and close the modal.
+     * Cancel deletes operation and closes the modal.
      */
     public function cancelDelete(int $userId): void
     {
