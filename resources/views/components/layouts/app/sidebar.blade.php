@@ -17,6 +17,8 @@
                     <flux:navlist.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>{{ __('User Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="cpu-chip" :href="route('admin.devices')" :current="request()->routeIs('admin.devices')" wire:navigate>{{ __('Device Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="puzzle-piece" :href="route('admin.things')" :current="request()->routeIs('admin.things')" wire:navigate>{{ __('Thing Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="variable" :href="route('admin.variables')" :current="request()->routeIs('admin.variables')" wire:navigate>{{ __('Variable Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="variable" :href="route('admin.triggers')" :current="request()->routeIs('admin.triggers')" wire:navigate>{{ __('Trigger Management') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
