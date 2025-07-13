@@ -11,6 +11,7 @@
             <flux:table.column sortable :sorted="$sortBy === 'name'" :direction="$sortDirection" wire:click="sort('name')">Name</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'thing_id'" :direction="$sortDirection" wire:click="sort('thing_id')">Thing ID</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'description'" :direction="$sortDirection" wire:click="sort('description')">Description</flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'status'" :direction="$sortDirection" wire:click="sort('status')">Status</flux:table.column>
             <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">Created</flux:table.column>
             <flux:table.column>Actions</flux:table.column>
         </flux:table.columns>
@@ -21,6 +22,11 @@
                     <flux:table.cell>{{ $thing->name }}</flux:table.cell>
                     <flux:table.cell>{{ $thing->thing_id }}</flux:table.cell>
                     <flux:table.cell>{{ $thing->description ?? 'N/A' }}</flux:table.cell>
+                    <flux:table.cell>
+                        <flux:badge size="sm" :color="$thing->status === 'online' ? 'green' : ($thing->status === 'offline' ? 'gray' : 'red')" inset="top bottom">
+                            {{ ucfirst($thing->status) }}
+                        </flux:badge>
+                    </flux:table.cell>
                     <flux:table.cell>{{ $thing->created_at->format('Y-m-d H:i') }}</flux:table.cell>
                     <flux:table.cell>
                         <div class="flex space-x-2">
@@ -60,6 +66,30 @@
                     <flux:textarea label="Properties (JSON)" wire:model="properties" placeholder='{"key": "value"}' />
                     @error('properties') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
 
+                    <flux:input label="Timezone" wire:model="timezone" placeholder="UTC" />
+                    @error('timezone') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:textarea label="Tags (JSON)" wire:model="tags" placeholder='["home", "temperature"]' />
+                    @error('tags') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:textarea label="Network Config (JSON)" wire:model="network_config" placeholder='{"wifi": {"ssid": "MyNetwork", "password": "secret"}}' />
+                    @error('network_config') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:select label="Sketch" wire:model="sketch_id">
+                        <option value="">-- Select Sketch --</option>
+                        @foreach($sketches as $sketch)
+                            <option value="{{ $sketch['id'] }}">{{ $sketch['name'] }}</option>
+                        @endforeach
+                    </flux:select>
+                    @error('sketch_id') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:select label="Status" wire:model="status">
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                        <option value="error">Error</option>
+                    </flux:select>
+                    @error('status') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
                     <div class="flex justify-end space-x-2 pt-4">
                         <flux:modal.close>
                             <flux:button>Cancel</flux:button>
@@ -93,6 +123,30 @@
 
                         <flux:textarea label="Properties (JSON)" wire:model="properties" placeholder='{"key": "value"}' />
                         @error('properties') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:input label="Timezone" wire:model="timezone" placeholder="UTC" />
+                        @error('timezone') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:textarea label="Tags (JSON)" wire:model="tags" placeholder='["home", "temperature"]' />
+                        @error('tags') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:textarea label="Network Config (JSON)" wire:model="network_config" placeholder='{"wifi": {"ssid": "MyNetwork", "password": "secret"}}' />
+                        @error('network_config') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:select label="Sketch" wire:model="sketch_id">
+                            <option value="">-- Select Sketch --</option>
+                            @foreach($sketches as $sketch)
+                                <option value="{{ $sketch['id'] }}">{{ $sketch['name'] }}</option>
+                            @endforeach
+                        </flux:select>
+                        @error('sketch_id') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:select label="Status" wire:model="status">
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                            <option value="error">Error</option>
+                        </flux:select>
+                        @error('status') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
 
                         <div class="flex justify-end space-x-2 pt-4">
                             <flux:modal.close>

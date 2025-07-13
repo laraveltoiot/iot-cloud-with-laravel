@@ -2,6 +2,7 @@
 
 namespace App\Livewire\IoTThing;
 
+use App\Models\Sketch;
 use App\Models\Thing;
 use Flux;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,6 +19,11 @@ final class ThingManagement extends Component
         'thing_id' => 'required|string|max:255',
         'description' => 'nullable|string',
         'properties' => 'nullable|json',
+        'timezone' => 'required|string',
+        'tags' => 'nullable|json',
+        'network_config' => 'nullable|json',
+        'sketch_id' => 'nullable|exists:sketches,id',
+        'status' => 'required|in:online,offline,error',
     ];
 
     // Sorting properties
@@ -34,9 +40,26 @@ final class ThingManagement extends Component
 
     public $properties = '';
 
+    public $timezone = 'UTC';
+
+    public $tags = '';
+
+    public $network_config = '';
+
+    public $sketch_id = null;
+
+    public $status = 'offline';
+
     public $editingThingId = null;
 
     public $isCreating = false;
+
+    public $sketches = [];
+
+    public function mount(): void
+    {
+        $this->loadSketches();
+    }
 
     public function sort($column): void
     {
@@ -46,6 +69,20 @@ final class ThingManagement extends Component
             $this->sortBy = $column;
             $this->sortDirection = 'asc';
         }
+    }
+
+    private function loadSketches(): void
+    {
+        $this->sketches = Sketch::where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get()
+            ->map(function ($sketch) {
+                return [
+                    'id' => $sketch->id,
+                    'name' => $sketch->name,
+                ];
+            })
+            ->toArray();
     }
 
     #[Computed]
@@ -76,6 +113,11 @@ final class ThingManagement extends Component
         $this->thing_id = $thing->thing_id;
         $this->description = $thing->description;
         $this->properties = is_array($thing->properties) ? json_encode($thing->properties) : $thing->properties;
+        $this->timezone = $thing->timezone;
+        $this->tags = is_array($thing->tags) ? json_encode($thing->tags) : $thing->tags;
+        $this->network_config = is_array($thing->network_config) ? json_encode($thing->network_config) : $thing->network_config;
+        $this->sketch_id = $thing->sketch_id;
+        $this->status = $thing->status;
     }
 
     public function saveThing(): void
@@ -87,6 +129,11 @@ final class ThingManagement extends Component
             'thing_id' => $this->thing_id,
             'description' => $this->description,
             'properties' => $this->properties ? json_decode($this->properties, true) : null,
+            'timezone' => $this->timezone,
+            'tags' => $this->tags ? json_decode($this->tags, true) : null,
+            'network_config' => $this->network_config ? json_decode($this->network_config, true) : null,
+            'sketch_id' => $this->sketch_id,
+            'status' => $this->status,
             'user_id' => auth()->id(),
         ];
 
@@ -149,5 +196,10 @@ final class ThingManagement extends Component
         $this->thing_id = '';
         $this->description = '';
         $this->properties = '';
+        $this->timezone = 'UTC';
+        $this->tags = '';
+        $this->network_config = '';
+        $this->sketch_id = null;
+        $this->status = 'offline';
     }
 }
