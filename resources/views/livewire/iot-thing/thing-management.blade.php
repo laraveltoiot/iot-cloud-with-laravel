@@ -1,0 +1,134 @@
+<section>
+    <div class="flex justify-between items-center mb-4">
+        <flux:heading size="lg">Thing Management</flux:heading>
+        <flux:modal.trigger name="create-thing">
+            <flux:button variant="primary" wire:click="createThing">Add Thing</flux:button>
+        </flux:modal.trigger>
+    </div>
+
+    <flux:table :paginate="$this->things">
+        <flux:table.columns>
+            <flux:table.column sortable :sorted="$sortBy === 'name'" :direction="$sortDirection" wire:click="sort('name')">Name</flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'thing_id'" :direction="$sortDirection" wire:click="sort('thing_id')">Thing ID</flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'description'" :direction="$sortDirection" wire:click="sort('description')">Description</flux:table.column>
+            <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">Created</flux:table.column>
+            <flux:table.column>Actions</flux:table.column>
+        </flux:table.columns>
+
+        <flux:table.rows>
+            @foreach ($this->things as $thing)
+                <flux:table.row :key="$thing->id">
+                    <flux:table.cell>{{ $thing->name }}</flux:table.cell>
+                    <flux:table.cell>{{ $thing->thing_id }}</flux:table.cell>
+                    <flux:table.cell>{{ $thing->description ?? 'N/A' }}</flux:table.cell>
+                    <flux:table.cell>{{ $thing->created_at->format('Y-m-d H:i') }}</flux:table.cell>
+                    <flux:table.cell>
+                        <div class="flex space-x-2">
+                            <flux:modal.trigger :name="'edit-thing-' . $thing->id">
+                                <flux:button variant="ghost" size="sm" icon="pencil" wire:click="editThing({{ $thing->id }})"></flux:button>
+                            </flux:modal.trigger>
+                            <flux:modal.trigger :name="'delete-thing-' . $thing->id">
+                                <flux:button variant="ghost" size="sm" icon="trash"></flux:button>
+                            </flux:modal.trigger>
+                        </div>
+                    </flux:table.cell>
+                </flux:table.row>
+            @endforeach
+        </flux:table.rows>
+    </flux:table>
+
+    <!-- Create Thing Modal -->
+    <flux:modal name="create-thing" class="md:w-96">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Add New Thing</flux:heading>
+                <flux:text class="mt-2">Enter the details for the new thing.</flux:text>
+            </div>
+
+            <form wire:submit="saveThing">
+                <div class="space-y-4">
+                    <flux:input label="Name" wire:model="name" placeholder="Thing name" />
+                    @error('name') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:input label="Thing ID" wire:model="thing_id" placeholder="Unique thing identifier" readonly disabled />
+                    <div class="text-gray-500 text-sm mt-1">A unique thing ID has been automatically generated.</div>
+                    @error('thing_id') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:textarea label="Description" wire:model="description" placeholder="Description of the thing" />
+                    @error('description') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <flux:textarea label="Properties (JSON)" wire:model="properties" placeholder='{"key": "value"}' />
+                    @error('properties') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <flux:modal.close>
+                            <flux:button>Cancel</flux:button>
+                        </flux:modal.close>
+                        <flux:button type="submit" variant="primary">Save Thing</flux:button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </flux:modal>
+
+    <!-- Edit Thing Modals -->
+    @foreach ($this->things as $thing)
+        <flux:modal :name="'edit-thing-' . $thing->id" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Edit Thing</flux:heading>
+                    <flux:text class="mt-2">Update the thing details.</flux:text>
+                </div>
+
+                <form wire:submit="saveThing">
+                    <div class="space-y-4">
+                        <flux:input label="Name" wire:model="name" placeholder="Thing name" />
+                        @error('name') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:input label="Thing ID" wire:model="thing_id" placeholder="Unique thing identifier" />
+                        @error('thing_id') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:textarea label="Description" wire:model="description" placeholder="Description of the thing" />
+                        @error('description') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <flux:textarea label="Properties (JSON)" wire:model="properties" placeholder='{"key": "value"}' />
+                        @error('properties') <div class="text-red-500 text-sm mt-1">{{ $message }}</div> @enderror
+
+                        <div class="flex justify-end space-x-2 pt-4">
+                            <flux:modal.close>
+                                <flux:button>Cancel</flux:button>
+                            </flux:modal.close>
+                            <flux:button type="submit" variant="primary">Update Thing</flux:button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </flux:modal>
+    @endforeach
+
+    <!-- Delete Thing Modals -->
+    @foreach ($this->things as $thing)
+        <flux:modal :name="'delete-thing-' . $thing->id" class="min-w-[22rem]">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Delete Thing?</flux:heading>
+
+                    <flux:text class="mt-2">
+                        <p>You're about to delete the thing "{{ $thing->name }}".</p>
+                        <p>This action cannot be reversed.</p>
+                    </flux:text>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Cancel</flux:button>
+                    </flux:modal.close>
+
+                    <flux:button type="button" variant="danger" wire:click="deleteThing({{ $thing->id }})">Delete Thing</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+    @endforeach
+</section>

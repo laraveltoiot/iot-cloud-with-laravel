@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,8 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 final class Thing extends Model
 {
-    use HasFactory;
-
     /**
      * The attributes that are not mass assignable.
      *
@@ -29,6 +26,8 @@ final class Thing extends Model
      */
     protected $casts = [
         'properties' => 'json',
+        'tags' => 'json',
+        'network_config' => 'json',
     ];
 
     /**
@@ -44,7 +43,7 @@ final class Thing extends Model
      */
     public function devices(): BelongsToMany
     {
-        return $this->belongsToMany(Device::class)
+        return $this->belongsToMany(Device::class, 'thing_device')
             ->withPivot('config')
             ->withTimestamps();
     }
@@ -55,5 +54,13 @@ final class Thing extends Model
     public function variables(): HasMany
     {
         return $this->hasMany(Variable::class);
+    }
+
+    /**
+     * Get the sketch associated with the thing.
+     */
+    public function sketch(): BelongsTo
+    {
+        return $this->belongsTo(Sketch::class);
     }
 }

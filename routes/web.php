@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\UserManagement;
 use App\Livewire\IotDevice\DeviceManagement;
+use App\Livewire\IoTThing\ThingManagement;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -25,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin routes
     Route::get('admin/users', UserManagement::class)->name('admin.users');
     Route::get('admin/devices', DeviceManagement::class)->name('admin.devices');
+    Route::get('admin/things', ThingManagement::class)->name('admin.things');
 });
 
 require __DIR__.'/auth.php';

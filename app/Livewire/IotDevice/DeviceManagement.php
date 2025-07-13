@@ -4,9 +4,6 @@ namespace App\Livewire\IotDevice;
 
 use App\Models\Device;
 use Flux;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

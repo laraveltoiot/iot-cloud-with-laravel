@@ -18,6 +18,11 @@ return new class extends Migration
             $table->string('thing_id')->unique(); // Unique identifier for the thing
             $table->text('description')->nullable();
             $table->json('properties')->nullable(); // Additional properties
+            $table->string('timezone')->default('UTC'); // Timezone for the thing
+            $table->json('tags')->nullable(); // Tags for categorizing the thing
+            $table->json('network_config')->nullable(); // Network configuration (WiFi credentials, etc.)
+            $table->foreignId('sketch_id')->nullable(); // Associated sketch
+            $table->enum('status', ['online', 'offline', 'error'])->default('offline'); // Thing status
             $table->timestamps();
         });
     }

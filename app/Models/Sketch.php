@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @mixin IdeHelperDevice
+ * @mixin IdeHelperSketch
  */
-final class Device extends Model
+final class Sketch extends Model
 {
     /**
      * The attributes that are not mass assignable.
@@ -24,11 +24,13 @@ final class Device extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'metadata' => 'json',
+        'compilation_result' => 'json',
+        'is_compiled' => 'boolean',
+        'last_compiled_at' => 'datetime',
     ];
 
     /**
-     * Get the user that owns the device.
+     * Get the user that owns the sketch.
      */
     public function user(): BelongsTo
     {
@@ -36,12 +38,10 @@ final class Device extends Model
     }
 
     /**
-     * Get the things associated with the device.
+     * Get the things that use this sketch.
      */
-    public function things(): BelongsToMany
+    public function things(): HasMany
     {
-        return $this->belongsToMany(Thing::class, 'thing_device')
-            ->withPivot('config')
-            ->withTimestamps();
+        return $this->hasMany(Thing::class);
     }
 }

@@ -125,13 +125,59 @@ namespace App\Models{
  * @property int $id
  * @property int $user_id
  * @property string $name
+ * @property string $sketch_id
+ * @property string|null $description
+ * @property string|null $code
+ * @property string $version
+ * @property \Illuminate\Support\Carbon|null $last_compiled_at
+ * @property bool $is_compiled
+ * @property array<array-key, mixed>|null $compilation_result
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Thing> $things
+ * @property-read int|null $things_count
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereCompilationResult($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereIsCompiled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereLastCompiledAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereSketchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Sketch whereVersion($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	final class IdeHelperSketch {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
  * @property string $thing_id
  * @property string|null $description
  * @property array<array-key, mixed>|null $properties
+ * @property string $timezone
+ * @property array<array-key, mixed>|null $tags
+ * @property array<array-key, mixed>|null $network_config
+ * @property int|null $sketch_id
+ * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Device> $devices
  * @property-read int|null $devices_count
+ * @property-read \App\Models\Sketch|null $sketch
  * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Variable> $variables
  * @property-read int|null $variables_count
@@ -142,8 +188,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereNetworkConfig($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereProperties($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereSketchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereTags($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereThingId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Thing whereUserId($value)
  * @mixin \Eloquent
@@ -224,6 +275,8 @@ namespace App\Models{
  * @property-read int|null $dashboards_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Device> $devices
  * @property-read int|null $devices_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Sketch> $sketches
+ * @property-read int|null $sketches_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Thing> $things
  * @property-read int|null $things_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Trigger> $triggers

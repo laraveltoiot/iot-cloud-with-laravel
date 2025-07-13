@@ -113,4 +113,12 @@ final class User extends Authenticatable
     {
         return $this->hasMany(Dashboard::class);
     }
+
+    /**
+     * Get the sketches for the user.
+     */
+    public function sketches(): HasMany
+    {
+        return $this->hasMany(Sketch::class);
+    }
 }

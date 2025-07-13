@@ -13,6 +13,11 @@ final class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            SketchSeeder::class,
+            ThingSeeder::class,
+            VariableSeeder::class,
+            TriggerSeeder::class,
+            DashboardSeeder::class,
         ]);
     }
 }
